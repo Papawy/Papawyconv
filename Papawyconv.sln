@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JaberConverter2", "JaberConverter2\JaberConverter2.csproj", "{7867833B-E570-4FFE-9193-0AF2B3B059AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "papawyconv", "Papawyconv\papawyconv.csproj", "{7867833B-E570-4FFE-9193-0AF2B3B059AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
