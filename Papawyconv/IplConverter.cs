@@ -19,7 +19,16 @@ namespace Papawyconv
             public int ObjectsWithoutCustomID = 0;
         }
 
-        public static IPLConvertResult ToCreateDynamicObject(string file, string outputPwn, IdeConverter.IDEConvertResult ideResult, bool acceptWithoutCustomID = false)
+        public class IPLConvertOptions
+        {
+            public double moddx = 0.0;
+            public double moddy = 0.0;
+            public double moddz = 0.0;
+            public double drawd = -1;
+            public double streamd = -1;
+        }
+
+        public static IPLConvertResult ToCreateDynamicObject(string file, string outputPwn, IdeConverter.IDEConvertResult ideResult, bool appendPawnFile = false, bool acceptWithoutCustomID = false, IPLConvertOptions options = null)
         {
             StreamReader iplReader = null;
             StreamWriter streamWriter = null;
@@ -27,7 +36,7 @@ namespace Papawyconv
             try
             {
                 iplReader = new StreamReader(file);
-                streamWriter = new StreamWriter(outputPwn, true);
+                streamWriter = new StreamWriter(outputPwn, appendPawnFile);
             }
             catch
             {
@@ -99,22 +108,36 @@ namespace Papawyconv
 
                     tmpObj.InteriorID = UInt32.Parse(lineParams[2]);
 
-                    tmpObj.posX = double.Parse(lineParams[3], CultureInfo.InvariantCulture);
-                    tmpObj.posY = double.Parse(lineParams[4], CultureInfo.InvariantCulture);
-                    tmpObj.posZ = double.Parse(lineParams[5], CultureInfo.InvariantCulture);
+                    tmpObj.posX = double.Parse(lineParams[3], CultureInfo.InvariantCulture) + (options == null ? 0 : options.moddx);
+                    tmpObj.posY = double.Parse(lineParams[4], CultureInfo.InvariantCulture) + (options == null ? 0 : options.moddy);
+                    tmpObj.posZ = double.Parse(lineParams[5], CultureInfo.InvariantCulture) + (options == null ? 0 : options.moddz);
 
                     double tmpRotX = float.Parse(lineParams[6], CultureInfo.InvariantCulture);
                     double tmpRotY = float.Parse(lineParams[7], CultureInfo.InvariantCulture);
                     double tmpRotZ = float.Parse(lineParams[8], CultureInfo.InvariantCulture);
                     double tmpRotW = float.Parse(lineParams[9], CultureInfo.InvariantCulture);
 
-                    Utils.QuatToEuler(tmpRotX, tmpRotY, tmpRotZ, tmpRotW, ref tmpObj.rotX, ref tmpObj.rotY, ref tmpObj.rotZ);
+                    // Utils.QuatToEuler(tmpRotX, tmpRotY, tmpRotZ, tmpRotW, ref tmpObj.rotX, ref tmpObj.rotY, ref tmpObj.rotZ);
+
+                    Utils.Quaternions.EulerRot objRot = Utils.Quaternions.ToEulerAngles(tmpRotX, tmpRotY, tmpRotZ, tmpRotW);
+
+                    tmpObj.rotX = double.IsNaN(objRot.x) ? 90.0 : objRot.x;
+                    tmpObj.rotY = double.IsNaN(objRot.y) ? 90.0 : objRot.y;
+                    tmpObj.rotZ = double.IsNaN(objRot.z) ? 90.0 : objRot.z;
 
                     tmpObj.IsMapObject = true;
 
+                    if(options != null)
+                    {
+                        if (options.drawd != -1)
+                            tmpObj.DrawDist = options.drawd;
+                        if (options.streamd != -1)
+                            tmpObj.StreamDist = options.streamd;
+                    }
+
                     result.MapObjects.Add(tmpObj);
                 }
-                catch
+                catch(Exception e)
                 {
                     result.ErrorCount += 1;
                 }
@@ -134,8 +157,8 @@ namespace Papawyconv
 
             foreach (GTAObject obj in result.MapObjects)
             {
-                streamWriter.WriteLine($"CreateDynamicObject({obj.SAMPID}, {obj.posX.ToString("F8", CultureInfo.InvariantCulture)}, {obj.posY.ToString("F8", CultureInfo.InvariantCulture)}, {obj.posZ.ToString("F8", CultureInfo.InvariantCulture)}, " +
-                    $"{obj.rotX.ToString("F8", CultureInfo.InvariantCulture)}, {obj.rotY.ToString("F8", CultureInfo.InvariantCulture)}, {obj.rotZ.ToString("F8", CultureInfo.InvariantCulture)}, -1, {obj.InteriorID}, -1," +
+                streamWriter.WriteLine($"CreateDynamicObject({obj.SAMPID}, {obj.posX.ToString("F", CultureInfo.InvariantCulture)}, {obj.posY.ToString("F", CultureInfo.InvariantCulture)}, {obj.posZ.ToString("F", CultureInfo.InvariantCulture)}, " +
+                    $"{obj.rotX.ToString("F", CultureInfo.InvariantCulture)}, {obj.rotY.ToString("F", CultureInfo.InvariantCulture)}, {obj.rotZ.ToString("F", CultureInfo.InvariantCulture)}, -1, {obj.InteriorID}, -1," +
                     $"{(obj.DrawDist == 0 ? "STREAMER_OBJECT_SD" : obj.DrawDist.ToString("F2", CultureInfo.InvariantCulture))}, {(obj.DrawDist == 0 ? "STREAMER_OBJECT_DD" : obj.DrawDist.ToString("F2", CultureInfo.InvariantCulture))});" +
                     $" // {obj.ModelName}");
             }

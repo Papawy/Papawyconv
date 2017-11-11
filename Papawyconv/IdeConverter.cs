@@ -18,7 +18,7 @@ namespace Papawyconv
             public int ErrorCount = 0;
         }
 
-        public static IDEConvertResult ToArtconf(string file, bool appendArtconf, string artconfName = "artconfig.txt")
+        public static IDEConvertResult ToArtconf(string file, bool appendArtconf, string artconfName = "artconfig.txt", bool noLod = false, string dir = "")
         {
             StreamReader ideReader = null;
             StreamWriter artconfWriter = null;
@@ -33,7 +33,7 @@ namespace Papawyconv
                     if (sampidCount == -1)
                         sampidCount = -2000;
                     else
-                        sampidCount += 1;
+                        sampidCount -= 1;
                 }
 
                 ideReader = new StreamReader(file);
@@ -93,11 +93,17 @@ namespace Papawyconv
 
                 try
                 {
+
+                    if (noLod)
+                        if (lineParams[1].StartsWith("lod") || lineParams[1].StartsWith("LOD"))
+                            continue;
+
                     GTAObject tmpObj = new GTAObject();
 
                     tmpObj.LegacyID = tmpObj.LegacyID = UInt32.Parse(lineParams[0]);
 
                     tmpObj.ModelName = lineParams[1];
+
                     tmpObj.DffName = lineParams[1] + ".dff";
                     tmpObj.TxdName = lineParams[2] + ".txd";
 
@@ -105,7 +111,7 @@ namespace Papawyconv
                     {
                         case 5:
                             {
-                                tmpObj.DrawDist = float.Parse(lineParams[3]);
+                                tmpObj.DrawDist = double.Parse(lineParams[3]);
                                 tmpObj.IDEFlags = UInt32.Parse(lineParams[4]);
                                 break;
                             }
@@ -113,7 +119,7 @@ namespace Papawyconv
                         case 6:
                             {
                                 tmpObj.MeshCount = uint.Parse(lineParams[3]);
-                                tmpObj.DrawDist = float.Parse(lineParams[4]);
+                                tmpObj.DrawDist = double.Parse(lineParams[4]);
                                 tmpObj.IDEFlags = UInt32.Parse(lineParams[5]);
                                 break;
                             }
@@ -121,7 +127,7 @@ namespace Papawyconv
                         case 7:
                             {
                                 tmpObj.MeshCount = uint.Parse(lineParams[3]);
-                                tmpObj.DrawDist = float.Parse(lineParams[4]);
+                                tmpObj.DrawDist = double.Parse(lineParams[4]);
                                 tmpObj.IDEFlags = UInt32.Parse(lineParams[6]);
                                 break;
                             }
@@ -129,7 +135,7 @@ namespace Papawyconv
                         case 8:
                             {
                                 tmpObj.MeshCount = uint.Parse(lineParams[3]);
-                                tmpObj.DrawDist = float.Parse(lineParams[4]);
+                                tmpObj.DrawDist = double.Parse(lineParams[4]);
                                 tmpObj.IDEFlags = UInt32.Parse(lineParams[7]);
                                 break;
                             }
@@ -158,7 +164,7 @@ namespace Papawyconv
             foreach (GTAObject obj in result.Objects)
             {
                 obj.SAMPID = sampidCount;
-                artconfWriter.WriteLine($"AddSimpleModel(-1, 19379, {sampidCount}, \"{obj.DffName}\", \"{obj.TxdName}\");");
+                artconfWriter.WriteLine($"AddSimpleModel(-1, 19379, {sampidCount}, \"{(dir == "" ? "" : dir+"/")}{obj.DffName}\", \"{(dir == "" ? "" : dir + "/")}{obj.TxdName}\");");
                 sampidCount -= 1;
             }
 

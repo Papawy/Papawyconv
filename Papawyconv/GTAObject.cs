@@ -11,7 +11,7 @@ namespace Papawyconv
         public bool IsMapObject = false;
 
         public uint LegacyID = 0;
-        public int SAMPID = -2000;
+        public int SAMPID = -1000;
 
         public string ModelName = "";
         public string DffName = "";
@@ -22,7 +22,8 @@ namespace Papawyconv
         public int VirtualWord = -1;
         public uint InteriorID = 0;
 
-        public float DrawDist = 0;
+        public double DrawDist = 0;
+        public double StreamDist = 0;
 
         public double posX;
         public double posY;
