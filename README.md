@@ -50,14 +50,3 @@ Questions
 - My generated pawn file contain only positive objects IDs !
 
 That's mostly because you forgot to link an IDE file while converting.
-
-It is built with Visual Studio 2017 and with .Net 4.5.
-It uses [CommandLineParser ](https://github.com/gsscoder/commandline).
-It uses ILMerge for merging assemblies.
-
-Questions
----
-
-- My generated pawn file contain only positive objects IDs !
-
-That's mostly because you forgot to link an IDE file while converting.
