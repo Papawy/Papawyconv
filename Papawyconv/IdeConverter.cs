@@ -63,9 +63,12 @@ namespace Papawyconv
 
             bool insideObjsSect = false;
 
+            uint lineCount = 0;
+
             while (!ideReader.EndOfStream)
             {
                 string line = ideReader.ReadLine();
+                lineCount += 1;
 
                 if (line == null)
                     continue;
@@ -145,9 +148,11 @@ namespace Papawyconv
 
                     result.Objects.Add(tmpObj);
                 }
-                catch
+                catch(Exception e)
                 {
                     result.ErrorCount += 1;
+                    if(Utils.VerboseOpt)
+                        Console.WriteLine($"\t[IDE] Error at line {lineCount}.\n\tExcept : {e.Message}");
                 }
             }
 

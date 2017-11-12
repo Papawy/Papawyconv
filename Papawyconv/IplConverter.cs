@@ -51,9 +51,12 @@ namespace Papawyconv
 
             IPLConvertResult result = new IPLConvertResult();
 
+            uint lineCount = 0;
+
             while (!iplReader.EndOfStream)
             {
                 string line = iplReader.ReadLine();
+                lineCount += 1;
 
                 if (line == null)
                     continue;
@@ -118,12 +121,16 @@ namespace Papawyconv
                     double tmpRotW = float.Parse(lineParams[9], CultureInfo.InvariantCulture);
 
                     // Utils.QuatToEuler(tmpRotX, tmpRotY, tmpRotZ, tmpRotW, ref tmpObj.rotX, ref tmpObj.rotY, ref tmpObj.rotZ);
+                    Quaternions.EulerRot objRot = new Quaternions.EulerRot();
+                    if (Utils.QuatOpt)
+                        objRot = Quaternions.JS.ToEulerAngles(tmpRotX, tmpRotY, tmpRotZ, tmpRotW);
+                    else
+                        objRot = Quaternions.MTA.ToEulerAngles(tmpRotX, tmpRotY, tmpRotZ, tmpRotW);
 
-                    Utils.Quaternions.EulerRot objRot = Utils.Quaternions.ToEulerAngles(tmpRotX, tmpRotY, tmpRotZ, tmpRotW);
 
-                    tmpObj.rotX = double.IsNaN(objRot.x) ? 90.0 : objRot.x;
-                    tmpObj.rotY = double.IsNaN(objRot.y) ? 90.0 : objRot.y;
-                    tmpObj.rotZ = double.IsNaN(objRot.z) ? 90.0 : objRot.z;
+                    tmpObj.rotX = objRot.x;
+                    tmpObj.rotY = objRot.y;
+                    tmpObj.rotZ = objRot.z;
 
                     tmpObj.IsMapObject = true;
 
@@ -140,6 +147,8 @@ namespace Papawyconv
                 catch(Exception e)
                 {
                     result.ErrorCount += 1;
+                    if(Utils.VerboseOpt)
+                        Console.WriteLine($"\t[IDE] Error at line {lineCount}.\n\tExcept : {e.Message}");
                 }
             }
 
@@ -159,7 +168,7 @@ namespace Papawyconv
             {
                 streamWriter.WriteLine($"CreateDynamicObject({obj.SAMPID}, {obj.posX.ToString("F", CultureInfo.InvariantCulture)}, {obj.posY.ToString("F", CultureInfo.InvariantCulture)}, {obj.posZ.ToString("F", CultureInfo.InvariantCulture)}, " +
                     $"{obj.rotX.ToString("F", CultureInfo.InvariantCulture)}, {obj.rotY.ToString("F", CultureInfo.InvariantCulture)}, {obj.rotZ.ToString("F", CultureInfo.InvariantCulture)}, -1, {obj.InteriorID}, -1," +
-                    $"{(obj.DrawDist == 0 ? "STREAMER_OBJECT_SD" : obj.DrawDist.ToString("F2", CultureInfo.InvariantCulture))}, {(obj.DrawDist == 0 ? "STREAMER_OBJECT_DD" : obj.DrawDist.ToString("F2", CultureInfo.InvariantCulture))});" +
+                    $"{(obj.StreamDist == 0 ? "STREAMER_OBJECT_SD" : obj.StreamDist.ToString("F2", CultureInfo.InvariantCulture))}, {(obj.DrawDist == 0 ? "STREAMER_OBJECT_DD" : obj.DrawDist.ToString("F2", CultureInfo.InvariantCulture))});" +
                     $" // {obj.ModelName}");
             }
 

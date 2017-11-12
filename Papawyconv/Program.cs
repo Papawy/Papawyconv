@@ -57,6 +57,9 @@ namespace Papawyconv
             [Option("streamdist", HelpText = "Set a streamdistance for all objects. Take effect during an IPL conversion.", DefaultValue = -1)]
             public double StreamDistance { get; set; }
 
+            [Option("quat", HelpText = "false = MTA Usefull funcs QuatsToEuler method | true = three.js QuasToEuler method.", DefaultValue = false)]
+            public bool QuatOpt { get; set; }
+
             [HelpOption]
             public string GetUsage()
             {
@@ -86,6 +89,8 @@ namespace Papawyconv
                     Console.WriteLine(opt.GetUsage());
                     return;
                 }
+
+                Utils.QuatOpt = opt.QuatOpt;
 
                 IdeConverter.IDEConvertResult ideResult = null;
 
