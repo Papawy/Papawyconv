@@ -81,7 +81,6 @@ namespace Papawyconv
                     insideObjsSect = true;
                     continue;
                 }
-                    insideObjsSect = true;
 
                 if (insideObjsSect && line == "end")
                     insideObjsSect = false;
