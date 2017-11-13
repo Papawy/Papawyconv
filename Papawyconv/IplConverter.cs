@@ -142,6 +142,13 @@ namespace Papawyconv
                             tmpObj.StreamDist = options.streamd;
                     }
 
+                    if (result.MapObjects.FindAll(obj => obj.SAMPID == tmpObj.SAMPID 
+                            && obj.posX == tmpObj.posX 
+                            && obj.posY == tmpObj.posY 
+                            && obj.posZ == tmpObj.posZ).Count != 0)
+
+                        Console.WriteLine($"IPL Duplicate at line {lineCount}.");
+
                     result.MapObjects.Add(tmpObj);
                 }
                 catch(Exception e)
