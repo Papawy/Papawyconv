@@ -72,7 +72,7 @@ namespace Papawyconv
                 Console.Out.Flush();
             }
 
-            return sampIds.Count != 0 ? sampIds[0] : -2000;
+            return sampIds.Count != 0 ? sampIds[0] : -1000;
         }
     }
 }

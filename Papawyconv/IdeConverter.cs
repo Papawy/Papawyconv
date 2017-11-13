@@ -14,7 +14,7 @@ namespace Papawyconv
         public class IDEConvertResult
         {
             public List<GTAObject> Objects = new List<GTAObject>();
-            public int LastSAMPID = -2000;
+            public int LastSAMPID = -1000;
             public int ErrorCount = 0;
         }
 
@@ -23,7 +23,7 @@ namespace Papawyconv
             StreamReader ideReader = null;
             StreamWriter artconfWriter = null;
 
-            int sampidCount = -2000;
+            int sampidCount = -1000;
 
             try
             {
@@ -31,7 +31,7 @@ namespace Papawyconv
                 {
                     sampidCount = Utils.GetLatestIDFromArtconf(artconfName);
                     if (sampidCount == -1)
-                        sampidCount = -2000;
+                        sampidCount = -1000;
                     else
                         sampidCount -= 1;
                 }
