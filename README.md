@@ -2,7 +2,7 @@
 Papawyconv
 ===
 
-### Version 0.1.5
+### Version 0.1.6
 ### Under Apache Licence 2.0
 
 Install
@@ -50,3 +50,7 @@ Questions
 - My generated pawn file contain only positive objects IDs !
 
 That's mostly because you forgot to link an IDE file while converting.
+
+Thanks
+---
+RIDE2DAY for bug testing.
