@@ -82,10 +82,17 @@ namespace Papawyconv
                 {
                     uint LegacyID = UInt32.Parse(lineParams[0]);
 
-                    GTAObject tmpObj = null;
+                    GTAObject tmpObj = null ;
 
                     if (ideResult != null)
-                        tmpObj = ideResult.Objects.Find(obj => obj.LegacyID == LegacyID);
+                    {
+                        var res = ideResult.Objects.Find(obj => obj.LegacyID == LegacyID);
+                        if(res != null)
+                        {
+                            tmpObj = new GTAObject();
+                            tmpObj.Clone(res);
+                        }
+                    }
 
                     if (tmpObj == null)
                     {
@@ -106,7 +113,6 @@ namespace Papawyconv
                         tmpObj.DrawDist = 0;
 
                         tmpObj.SAMPID = (int)LegacyID;
-
                     }
 
                     tmpObj.InteriorID = UInt32.Parse(lineParams[2]);
@@ -142,12 +148,16 @@ namespace Papawyconv
                             tmpObj.StreamDist = options.streamd;
                     }
 
-                    if (result.MapObjects.FindAll(obj => obj.SAMPID == tmpObj.SAMPID 
-                            && obj.posX == tmpObj.posX 
-                            && obj.posY == tmpObj.posY 
-                            && obj.posZ == tmpObj.posZ).Count != 0)
-
-                        Console.WriteLine($"IPL Duplicate at line {lineCount}.");
+                    if (result.MapObjects.FindAll(obj => obj.SAMPID == tmpObj.SAMPID
+                            && obj.posX == tmpObj.posX
+                            && obj.posY == tmpObj.posY
+                            && obj.posZ == tmpObj.posZ 
+                            && obj.rotX == tmpObj.rotX
+                            && obj.rotY == tmpObj.rotY
+                            && obj.rotZ == tmpObj.rotZ).Count > 0)
+                    {
+                        Console.WriteLine($"\tIPL Duplicate at line {lineCount}.");
+                    }
 
                     result.MapObjects.Add(tmpObj);
                 }

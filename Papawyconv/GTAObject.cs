@@ -36,5 +36,36 @@ namespace Papawyconv
         public int LOD = -1;
 
         public UInt32 IDEFlags = 0;
+
+        public void Clone(GTAObject other, bool clonePos = true)
+        {
+            this.IsMapObject = other.IsMapObject;
+
+            this.LegacyID = other.LegacyID;
+            this.SAMPID = other.SAMPID;
+
+            this.ModelName = other.ModelName;
+            this.DffName = other.DffName;
+            this.TxdName = other.TxdName;
+
+            this.MeshCount = other.MeshCount;
+            this.VirtualWord = other.VirtualWord;
+            this.InteriorID = other.InteriorID;
+
+            this.DrawDist = other.DrawDist;
+            this.StreamDist = other.StreamDist;
+
+            if(clonePos)
+            {
+                this.posX = other.posX;
+                this.posY = other.posY;
+                this.posZ = other.posZ;
+
+                this.rotX = other.rotX;
+                this.rotY = other.rotY;
+                this.rotZ = other.rotZ;
+            }
+
+        }
     }
 }
