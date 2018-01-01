@@ -62,7 +62,7 @@ namespace Papawyconv
             IDEConvertResult result = new IDEConvertResult();
 
             bool insideObjsSect = false;
-
+            bool insideTobjSect = false;
             uint lineCount = 0;
 
             while (!ideReader.EndOfStream)
@@ -82,77 +82,166 @@ namespace Papawyconv
                     continue;
                 }
 
-                if (insideObjsSect && line == "end")
-                    insideObjsSect = false;
+                if (line == "tobj")
+                {
+                    insideTobjSect = true;
+                    continue;
+                }
 
-                if (insideObjsSect == false)
+                if ((insideObjsSect || insideTobjSect) && line == "end")
+                {
+                    insideObjsSect = false;
+                    insideTobjSect = false;
+                }
+
+                if (insideObjsSect == false && insideTobjSect == false)
                     continue;
 
                 string[] lineParams = line.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                if (lineParams.Length < 5 || lineParams.Length > 8)
-                    continue;
+                if(insideObjsSect == true)
+				{
+                
+					if (lineParams.Length < 5 || lineParams.Length > 8)
+						continue;
 
-                try
-                {
+					try
+					{
 
-                    if (noLod)
-                        if (lineParams[1].StartsWith("lod") || lineParams[1].StartsWith("LOD"))
-                            continue;
+						if (noLod)
+							if (lineParams[1].StartsWith("lod") || lineParams[1].StartsWith("LOD"))
+								continue;
 
-                    GTAObject tmpObj = new GTAObject();
+						GTAObject tmpObj = new GTAObject();
 
-                    tmpObj.LegacyID = tmpObj.LegacyID = UInt32.Parse(lineParams[0]);
+						tmpObj.LegacyID = tmpObj.LegacyID = UInt32.Parse(lineParams[0]);
 
-                    tmpObj.ModelName = lineParams[1];
+						tmpObj.ModelName = lineParams[1];
 
-                    tmpObj.DffName = lineParams[1] + ".dff";
-                    tmpObj.TxdName = lineParams[2] + ".txd";
+						tmpObj.DffName = lineParams[1] + ".dff";
+						tmpObj.TxdName = lineParams[2] + ".txd";
 
-                    switch(lineParams.Length)
-                    {
-                        case 5:
-                            {
-                                tmpObj.DrawDist = double.Parse(lineParams[3]);
-                                tmpObj.IDEFlags = UInt32.Parse(lineParams[4]);
-                                break;
-                            }
+						switch(lineParams.Length)
+						{
+							case 5:
+								{
+									tmpObj.DrawDist = double.Parse(lineParams[3]);
+									tmpObj.IDEFlags = UInt32.Parse(lineParams[4]);
+									break;
+								}
 
-                        case 6:
-                            {
-                                tmpObj.MeshCount = uint.Parse(lineParams[3]);
-                                tmpObj.DrawDist = double.Parse(lineParams[4]);
-                                tmpObj.IDEFlags = UInt32.Parse(lineParams[5]);
-                                break;
-                            }
+							case 6:
+								{
+									tmpObj.MeshCount = uint.Parse(lineParams[3]);
+									tmpObj.DrawDist = double.Parse(lineParams[4]);
+									tmpObj.IDEFlags = UInt32.Parse(lineParams[5]);
+									break;
+								}
 
-                        case 7:
-                            {
-                                tmpObj.MeshCount = uint.Parse(lineParams[3]);
-                                tmpObj.DrawDist = double.Parse(lineParams[4]);
-                                tmpObj.IDEFlags = UInt32.Parse(lineParams[6]);
-                                break;
-                            }
+							case 7:
+								{
+									tmpObj.MeshCount = uint.Parse(lineParams[3]);
+									tmpObj.DrawDist = double.Parse(lineParams[4]);
+									tmpObj.IDEFlags = UInt32.Parse(lineParams[6]);
+									break;
+								}
 
-                        case 8:
-                            {
-                                tmpObj.MeshCount = uint.Parse(lineParams[3]);
-                                tmpObj.DrawDist = double.Parse(lineParams[4]);
-                                tmpObj.IDEFlags = UInt32.Parse(lineParams[7]);
-                                break;
-                            }
-                        default:
-                            break;
-                    }
+							case 8:
+								{
+									tmpObj.MeshCount = uint.Parse(lineParams[3]);
+									tmpObj.DrawDist = double.Parse(lineParams[4]);
+									tmpObj.IDEFlags = UInt32.Parse(lineParams[7]);
+									break;
+								}
+							default:
+								break;
+						}
 
-                    result.Objects.Add(tmpObj);
-                }
-                catch(Exception e)
-                {
-                    result.ErrorCount += 1;
-                    if(Utils.VerboseOpt)
-                        Console.WriteLine($"\t[IDE] Error at line {lineCount}.\n\tExcept : {e.Message}");
-                }
+						result.Objects.Add(tmpObj);
+					}
+					catch(Exception e)
+					{
+						result.ErrorCount += 1;
+						if(Utils.VerboseOpt)
+							Console.WriteLine($"\t[IDE] Error at line {lineCount}.\n\tExcept : {e.Message}");
+					}
+				}
+				else if(insideTobjSect == true)
+				{
+					if (lineParams.Length < 7 || lineParams.Length > 10)
+						continue;
+
+					try
+					{
+
+						if (noLod)
+							if (lineParams[1].StartsWith("lod") || lineParams[1].StartsWith("LOD"))
+								continue;
+
+						GTAObject tmpObj = new GTAObject();
+
+						tmpObj.LegacyID = tmpObj.LegacyID = UInt32.Parse(lineParams[0]);
+
+						tmpObj.ModelName = lineParams[1];
+
+						tmpObj.DffName = lineParams[1] + ".dff";
+						tmpObj.TxdName = lineParams[2] + ".txd";
+
+                        tmpObj.Timed = true;
+
+                        switch (lineParams.Length)
+						{
+							case 7:
+								{
+									tmpObj.DrawDist = double.Parse(lineParams[3]);
+									tmpObj.IDEFlags = UInt32.Parse(lineParams[4]);
+									tmpObj.TimeOn = int.Parse(lineParams[5]);
+									tmpObj.TimeOff = int.Parse(lineParams[6]);
+									break;
+								}
+
+							case 8:
+								{
+									tmpObj.MeshCount = uint.Parse(lineParams[3]);
+									tmpObj.DrawDist = double.Parse(lineParams[4]);
+									tmpObj.IDEFlags = UInt32.Parse(lineParams[5]);
+									tmpObj.TimeOn = int.Parse(lineParams[6]);
+									tmpObj.TimeOff = int.Parse(lineParams[7]);
+									break;
+								}
+
+							case 9:
+								{
+									tmpObj.MeshCount = uint.Parse(lineParams[3]);
+									tmpObj.DrawDist = double.Parse(lineParams[4]);
+									tmpObj.IDEFlags = UInt32.Parse(lineParams[6]);
+									tmpObj.TimeOn = int.Parse(lineParams[7]);
+									tmpObj.TimeOff = int.Parse(lineParams[8]);
+									break;
+								}
+
+							case 10:
+								{
+									tmpObj.MeshCount = uint.Parse(lineParams[3]);
+									tmpObj.DrawDist = double.Parse(lineParams[4]);
+									tmpObj.IDEFlags = UInt32.Parse(lineParams[7]);
+									tmpObj.TimeOn = int.Parse(lineParams[8]);
+									tmpObj.TimeOff = int.Parse(lineParams[9]);
+									break;
+								}
+							default:
+								break;
+						}
+
+						result.Objects.Add(tmpObj);
+					}
+					catch(Exception e)
+					{
+						result.ErrorCount += 1;
+						if(Utils.VerboseOpt)
+							Console.WriteLine($"\t[IDE] Error at line {lineCount}.\n\tExcept : {e.Message}");
+					}
+				}
             }
 
             ideReader.Close();
@@ -168,7 +257,10 @@ namespace Papawyconv
             foreach (GTAObject obj in result.Objects)
             {
                 obj.SAMPID = sampidCount;
-                artconfWriter.WriteLine($"AddSimpleModel(-1, 19379, {sampidCount}, \"{(dir == "" ? "" : dir+"/")}{obj.DffName}\", \"{(dir == "" ? "" : dir + "/")}{obj.TxdName}\");");
+                if (obj.Timed == true)
+                    artconfWriter.WriteLine($"AddSimpleModelTimed(-1, 19379, {sampidCount}, \"{(dir == "" ? "" : dir + "/")}{obj.DffName}\", \"{(dir == "" ? "" : dir + "/")}{obj.TxdName}\", {obj.TimeOn}, {obj.TimeOff});");
+                else
+                    artconfWriter.WriteLine($"AddSimpleModel(-1, 19379, {sampidCount}, \"{(dir == "" ? "" : dir + "/")}{obj.DffName}\", \"{(dir == "" ? "" : dir + "/")}{obj.TxdName}\");");
                 sampidCount -= 1;
             }
 
