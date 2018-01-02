@@ -37,6 +37,11 @@ namespace Papawyconv
 
         public UInt32 IDEFlags = 0;
 
+        public bool Timed = false;
+
+        public int TimeOn = 0;
+        public int TimeOff = 0;
+
         public void Clone(GTAObject other, bool clonePos = true)
         {
             this.IsMapObject = other.IsMapObject;
