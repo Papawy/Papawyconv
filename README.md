@@ -2,7 +2,7 @@
 Papawyconv
 ===
 
-### Version 0.1.6
+### Version 0.1.7
 [![Build status](https://ci.appveyor.com/api/projects/status/kii0o75w1u6ampfb?svg=true)](https://ci.appveyor.com/project/papawy/papawyconv)
 
 ### Under Apache Licence 2.0

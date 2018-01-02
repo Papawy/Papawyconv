@@ -65,7 +65,7 @@ namespace Papawyconv
             {
                 HelpText help = new HelpText
                 {
-                    Heading = new HeadingInfo("Papawyconf", "0.1.6"),
+                    Heading = new HeadingInfo("Papawyconf", "0.1.7"),
                     AdditionalNewLineAfterOption = true,
                     AddDashesToOption = true
                 };
